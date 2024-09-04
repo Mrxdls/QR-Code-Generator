@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>QR Code Generator</title>
+</head>
+<body>
+    <div class="container">
+        <span class="close">&times;</span>
+        <h2>QR Code Generator</h2>
+        <form id="qrForm" method="POST" action="/generate_qr">
+            <label for="link">Link</label>
+            <input type="text" id="link" name="link" placeholder="Enter link...">
+
+            <button type="submit">Generate QR Code</button>
+        </form>
+        <div id="qrCodeContainer" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        const closeButton = document.querySelector('.close');
+        const form = document.getElementById('qrForm');
+        const qrCodeContainer = document.getElementById('qrCodeContainer');
+
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(document.querySelector('.container'));
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const blob = await response.blob(); // Get the image blob
+                const url = URL.createObjectURL(blob); // Create a URL for the image
+
+                qrCodeContainer.innerHTML = `<img src="${url}" alt="QR Code" />`; // Display the QR code
+            } else {
+                qrCodeContainer.innerHTML = 'Error generating QR code. Please try again.'; // Error message
+            }
+        });
+    </script>
+</body>
+</html>
